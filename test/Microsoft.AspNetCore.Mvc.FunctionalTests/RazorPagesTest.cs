@@ -606,6 +606,21 @@ Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary`1[AspNetCore._InjectedP
             Assert.Equal(expected, response.Trim());
         }
 
+        [Fact]
+        public async Task PageRoute_UsingSpecifiedPageNameToRoute()
+        {
+            // Arrange
+            var expected = 
+@"<a href=""/Pages/Admin/Login/42"">Link</a>
+<a href=""/Pages/Admin/Login/42"">Link</a>";
+
+            // Act
+            var response = await Client.GetStringAsync("/Pages/Routes/RouteUsingSpecificName");
+
+            // Assert
+            Assert.Equal(expected, response.Trim());
+        }
+
         private async Task AddAntiforgeryHeaders(HttpRequestMessage request)
         {
             var getResponse = await Client.GetAsync(request.RequestUri);

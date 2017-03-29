@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Razor.Host;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
 using Microsoft.AspNetCore.Razor.Evolution;
 using Microsoft.Extensions.Options;
 
@@ -16,15 +16,18 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure
     public class PageActionDescriptorProvider : IActionDescriptorProvider
     {
         private static readonly string IndexFileName = "Index.cshtml";
+        private readonly RazorTemplateEngine _templateEngine;
         private readonly RazorProject _project;
         private readonly MvcOptions _mvcOptions;
         private readonly RazorPagesOptions _pagesOptions;
 
         public PageActionDescriptorProvider(
+            RazorEngine razorEngine,
             RazorProject project,
             IOptions<MvcOptions> mvcOptionsAccessor,
             IOptions<RazorPagesOptions> pagesOptionsAccessor)
         {
+            _templateEngine = new RazorTemplateEngine(razorEngine, project);
             _project = project;
             _mvcOptions = mvcOptionsAccessor.Value;
             _pagesOptions = pagesOptionsAccessor.Value;
@@ -42,21 +45,20 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure
                     continue;
                 }
 
-                string template;
-                if (!PageDirectiveFeature.TryGetPageDirective(item, out template))
+                if (!PageDirectiveFeature.TryGetPageDirective(_templateEngine, item, out var directive))
                 {
                     // .cshtml pages without @page are not RazorPages.
                     continue;
                 }
 
-                if (AttributeRouteModel.IsOverridePattern(template))
+                if (AttributeRouteModel.IsOverridePattern(directive.RouteTemplate))
                 {
                     throw new InvalidOperationException(string.Format(
                         Resources.PageActionDescriptorProvider_RouteTemplateCannotBeOverrideable,
                         item.Path));
                 }
 
-                AddActionDescriptors(context.Results, item, template);
+                AddActionDescriptors(context.Results, item, directive);
             }
         }
 
@@ -64,11 +66,21 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure
         {
         }
 
-        private void AddActionDescriptors(IList<ActionDescriptor> actions, RazorProjectItem item, string template)
+        private void AddActionDescriptors(IList<ActionDescriptor> actions, RazorProjectItem item, PageDirective template)
         {
-            var model = new PageApplicationModel(item.CombinedPath, item.PathWithoutExtension);
+            var rootRelativePath = item.CombinedPath;
+            var viewEnginePath = item.PathWithoutExtension;
+            var name = template.Name;
+            if (string.IsNullOrEmpty(name))
+            {
+                name = viewEnginePath.Substring(1);
+            }
+            var model = new PageApplicationModel(rootRelativePath, viewEnginePath)
+            {
+                Name = name,
+            };
             var routePrefix = item.PathWithoutExtension;
-            model.Selectors.Add(CreateSelectorModel(routePrefix, template));
+            model.Selectors.Add(CreateSelectorModel(routePrefix, template.RouteTemplate));
 
             if (string.Equals(IndexFileName, item.FileName, StringComparison.OrdinalIgnoreCase))
             {
@@ -82,7 +94,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure
                 {
                     parentDirectoryPath = parentDirectoryPath.Substring(0, index);
                 }
-                model.Selectors.Add(CreateSelectorModel(parentDirectoryPath, template));
+                model.Selectors.Add(CreateSelectorModel(parentDirectoryPath, template.RouteTemplate));
             }
 
             for (var i = 0; i < _pagesOptions.Conventions.Count; i++)
@@ -103,6 +115,13 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure
 
             foreach (var selector in model.Selectors)
             {
+                var pathWithoutExtension = item.PathWithoutExtension;
+                // It is imperative that the path does not have a leading slash
+                if (pathWithoutExtension.StartsWith("/", StringComparison.Ordinal))
+                {
+                    pathWithoutExtension = pathWithoutExtension.Substring(1);
+                }
+
                 actions.Add(new PageActionDescriptor()
                 {
                     AttributeRouteInfo = new AttributeRouteInfo()
@@ -117,7 +136,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure
                     RelativePath = item.CombinedPath,
                     RouteValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                     {
-                        { "page", item.PathWithoutExtension },
+                        { "page", model.Name },
                     },
                     ViewEnginePath = item.Path,
                 });

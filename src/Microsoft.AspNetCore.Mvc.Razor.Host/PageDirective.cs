@@ -7,13 +7,24 @@ using Microsoft.AspNetCore.Razor.Evolution.Intermediate;
 
 namespace Microsoft.AspNetCore.Mvc.Razor.Host
 {
-    public static class PageDirective
+    public class PageDirective
     {
         public static readonly DirectiveDescriptor DirectiveDescriptor = DirectiveDescriptorBuilder
             .Create("page")
             .BeginOptionals()
-            .AddString()
+            .AddString() // "route-template"
+            .AddString() // "page-name"
             .Build();
+
+        private PageDirective(string routeTemplate, string name)
+        {
+            RouteTemplate = routeTemplate;
+            Name = name;
+        }
+
+        public string RouteTemplate { get; }
+
+        public string Name { get; }
 
         public static IRazorEngineBuilder Register(IRazorEngineBuilder builder)
         {
@@ -21,7 +32,7 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Host
             return builder;
         }
 
-        public static bool TryGetRouteTemplate(DocumentIRNode irDocument, out string routeTemplate)
+        public static bool TryGetPageDirective(DocumentIRNode irDocument, out PageDirective directive)
         {
             var visitor = new Visitor();
             for (var i = 0; i < irDocument.Children.Count; i++)
@@ -29,7 +40,7 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Host
                 visitor.Visit(irDocument.Children[i]);
             }
 
-            routeTemplate = visitor.RouteTemplate;
+            directive = new PageDirective(visitor.RouteTemplate, visitor.Name);
             return visitor.DirectiveNode != null;
         }
 
@@ -39,12 +50,23 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Host
 
             public string RouteTemplate { get; private set; }
 
+            public string Name { get; private set; }
+
             public override void VisitDirective(DirectiveIRNode node)
             {
                 if (node.Descriptor == DirectiveDescriptor)
                 {
                     DirectiveNode = node;
-                    RouteTemplate = node.Tokens.FirstOrDefault()?.Content;
+                    var tokens = node.Tokens.ToList();
+                    if (tokens.Count > 0)
+                    {
+                        RouteTemplate = tokens[0].Content.Trim('"');
+                    }
+                    
+                    if (tokens.Count > 1)
+                    {
+                        Name = tokens[1].Content.Trim('"');
+                    }
                 }
             }
         }

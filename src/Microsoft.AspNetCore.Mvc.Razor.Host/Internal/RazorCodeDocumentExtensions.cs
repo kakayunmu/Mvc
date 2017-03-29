@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.AspNetCore.Mvc.Razor.Host;
 using Microsoft.AspNetCore.Razor.Evolution;
 
 namespace Microsoft.AspNetCore.Mvc.Razor.Internal
@@ -29,6 +30,26 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Internal
             }
 
             document.Items[RelativePathKey] = relativePath;
+        }
+
+        public static void SetPageDirective(this RazorCodeDocument document, PageDirective directive)
+        {
+            if (document == null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
+            document.Items[typeof(PageDirective)] = directive;
+        }
+
+        public static PageDirective GetPageDirective(this RazorCodeDocument document)
+        {
+            if (document == null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
+            return(PageDirective)document.Items[typeof(PageDirective)];
         }
     }
 }

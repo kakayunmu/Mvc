@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var content = await response.Content.ReadAsStringAsync();
-            Assert.Equal("Hello from /Index", content.Trim());
+            Assert.Equal("Hello from Index", content.Trim());
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var content = await response.Content.ReadAsStringAsync();
-            Assert.Equal("Hello from /Index", content.Trim());
+            Assert.Equal("Hello from Index", content.Trim());
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var content = await response.Content.ReadAsStringAsync();
-            Assert.Equal("Hello from /Admin/Index", content.Trim());
+            Assert.Equal("Hello from Admin/Index", content.Trim());
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var content = await response.Content.ReadAsStringAsync();
-            Assert.Equal("Hello from /Admin/RouteTemplate 1", content.Trim());
+            Assert.Equal("Hello from Admin/RouteTemplate 1", content.Trim());
         }
 
         [Fact]
@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var content = await response.Content.ReadAsStringAsync();
-            Assert.Equal("Hello from /Admin/RouteTemplate my-user-id 4", content.Trim());
+            Assert.Equal("Hello from Admin/RouteTemplate my-user-id 4", content.Trim());
         }
 
         [Fact]
@@ -138,6 +138,51 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
 
             // Act
             var response = await Client.GetStringAsync("/WithPageImport");
+
+            // Assert
+            Assert.Equal(expected, response.Trim());
+        }
+
+        [Fact]
+        public async Task PageRoute_UsingSpecifiedPageNameToRoute()
+        {
+            // Arrange
+            var expected = 
+@"<a href=""/Admin/Login/42"">Link</a>
+<a href=""/Admin/Login/42"">Link</a>";
+
+            // Act
+            var response = await Client.GetStringAsync("/Routes/RouteUsingSpecificName");
+
+            // Assert
+            Assert.Equal(expected, response.Trim());
+        }
+
+        [Fact]
+        public async Task PageRoute_UsingDefaultPageNameToRoute()
+        {
+            // Arrange
+            var expected = 
+@"<a href=""/Routes/Sibling"">Link</a>
+<a href=""/Routes/Sibling"">Link</a>";
+
+            // Act
+            var response = await Client.GetStringAsync("/Routes/RouteUsingDefaultName");
+
+            // Assert
+            Assert.Equal(expected, response.Trim());
+        }
+
+        [Fact]
+        public async Task PageRoute_UsingPageNameConfiguredViaStartup()
+        {
+            // Arrange
+            var expected = 
+@"<a href=""/Routes/NameConfiguredAtStartup"">Link</a>
+<a href=""/Routes/NameConfiguredAtStartup"">Link</a>";
+
+            // Act
+            var response = await Client.GetStringAsync("/Routes/RouteUsingStartupConfiguredName");
 
             // Assert
             Assert.Equal(expected, response.Trim());
