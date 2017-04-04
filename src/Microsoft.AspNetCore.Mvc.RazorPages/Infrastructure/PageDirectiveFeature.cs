@@ -11,21 +11,25 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure
     {
         public static bool TryGetPageDirective(RazorProjectItem projectItem, out string template)
         {
-            if (projectItem == null)
+            return TryGetPageDirective(projectItem.Read, out template);
+        }
+
+        public static bool TryGetPageDirective(Func<Stream> streamFactory, out string template)
+        {
+            if (streamFactory == null)
             {
-                throw new ArgumentNullException(nameof(projectItem));
+                throw new ArgumentNullException(nameof(streamFactory));
             }
 
             const string PageDirective = "@page";
 
-            var stream = projectItem.Read();
-
-            string content = null;
-            using (var streamReader = new StreamReader(stream))
+            string content;
+            using (var streamReader = new StreamReader(streamFactory()))
             {
                 do
                 {
                     content = streamReader.ReadLine();
+
                 } while (content != null && string.IsNullOrWhiteSpace(content));
                 content = content?.Trim();
             }

@@ -219,13 +219,10 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
                 PageStartFileName);
             foreach (var item in pageStartItems)
             {
-                if (item.Exists)
+                var factoryResult = _razorPageFactoryProvider.CreateFactory(item.Path);
+                if (factoryResult.Success)
                 {
-                    var factoryResult = _razorPageFactoryProvider.CreateFactory(item.Path);
-                    if (factoryResult.Success)
-                    {
-                        pageStartFactories.Insert(0, factoryResult.RazorPageFactory);
-                    }
+                    pageStartFactories.Insert(0, factoryResult.RazorPageFactory);
                 }
             }
 
