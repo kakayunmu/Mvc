@@ -813,16 +813,14 @@ namespace Microsoft.AspNetCore.Mvc.Core
         /// </summary>
         internal static string ModelBinding_MissingRequestBodyRequiredMember
         {
-            get { return GetString("ModelBinding_MissingRequestBodyRequiredMember"); }
+            get => GetString("ModelBinding_MissingRequestBodyRequiredMember");
         }
 
         /// <summary>
         /// A non-empty request body is required.
         /// </summary>
         internal static string FormatModelBinding_MissingRequestBodyRequiredMember()
-        {
-            return GetString("ModelBinding_MissingRequestBodyRequiredMember");
-        }
+            => GetString("ModelBinding_MissingRequestBodyRequiredMember");
 
         /// <summary>
         /// The parameter conversion from type '{0}' to type '{1}' failed because no type converter can convert between these types.
