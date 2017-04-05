@@ -114,7 +114,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
 
             var httpContext = bindingContext.HttpContext;
 
-            var allowEmptyInput = _options?.AllowEmptyInputInInputFormatter == true;
+            var allowEmptyInput = _options?.AllowEmptyInputInBodyModelBinding == true;
 
             var formatterContext = new InputFormatterContext(
                 httpContext,
@@ -170,8 +170,6 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
                     // If instead the input formatter wants to treat the input as optional, it must do so by
                     // returning InputFormatterResult.Success(defaultForModelType), because input formatters
                     // are responsible for choosing a default value for the model type.
-                    bindingContext.Result = ModelBindingResult.Failed();
-
                     var message = bindingContext
                         .ModelMetadata
                         .ModelBindingMessageProvider

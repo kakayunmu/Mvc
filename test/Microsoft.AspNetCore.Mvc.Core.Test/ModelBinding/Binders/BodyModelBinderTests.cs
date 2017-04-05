@@ -124,7 +124,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
             mockInputFormatter.Setup(f => f.CanRead(It.IsAny<InputFormatterContext>()))
                 .Returns(true);
             mockInputFormatter.Setup(o => o.ReadAsync(It.IsAny<InputFormatterContext>()))
-                              .Returns(InputFormatterResult.NoValueAsync());
+                .Returns(InputFormatterResult.NoValueAsync());
             var inputFormatter = mockInputFormatter.Object;
 
             var provider = new TestModelMetadataProvider();
@@ -166,8 +166,8 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
             mockInputFormatter.Setup(f => f.CanRead(It.IsAny<InputFormatterContext>()))
                 .Returns(true);
             mockInputFormatter.Setup(o => o.ReadAsync(It.IsAny<InputFormatterContext>()))
-                              .Returns(InputFormatterResult.NoValueAsync())
-                              .Verifiable();
+                .Returns(InputFormatterResult.NoValueAsync())
+                .Verifiable();
             var inputFormatter = mockInputFormatter.Object;
 
             var provider = new TestModelMetadataProvider();
@@ -394,7 +394,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
         {
             var sink = new TestSink();
             var loggerFactory = new TestLoggerFactory(sink, enabled: true);
-            var options = new MvcOptions { AllowEmptyInputInInputFormatter = treatEmptyInputAsDefaultValueOption };
+            var options = new MvcOptions { AllowEmptyInputInBodyModelBinding = treatEmptyInputAsDefaultValueOption };
             return new BodyModelBinder(formatters, new TestHttpRequestStreamReaderFactory(), loggerFactory, options);
         }
 

@@ -390,7 +390,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             var formatter = new BadConfigurationFormatter();
             var context = new InputFormatterContext(
                 new DefaultHttpContext(),
-                "",
+                string.Empty,
                 new ModelStateDictionary(),
                 new EmptyModelMetadataProvider().GetMetadataForType(typeof(object)),
                 (s, e) => new StreamReader(s, e));
@@ -419,7 +419,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             var formatter = new TestFormatter();
             var context = new InputFormatterContext(
                 new DefaultHttpContext(),
-                "",
+                string.Empty,
                 new ModelStateDictionary(),
                 new EmptyModelMetadataProvider().GetMetadataForType(typeof(object)),
                 (s, e) => new StreamReader(s, e),

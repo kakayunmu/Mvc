@@ -35,16 +35,16 @@ namespace Microsoft.AspNetCore.Mvc
         }
 
         /// <summary>
-        /// Gets or sets the flag which decides whether input formatters (for example, using
-        /// <see cref="FromBodyAttribute"/>) should allow no input to be provided.
-        /// <see langword="false"/> by default.
+        /// Gets or sets the flag which decides whether body model binding (for example, on an
+        /// action method parameter with <see cref="FromBodyAttribute"/>) should treat empty
+        /// input as valid. <see langword="false"/> by default.
         /// </summary>
         /// <example>
         /// When <see langword="false"/>, actions that model bind the request body (for example,
-        /// using <see cref="FromBodyAttribute"/>) will register a validation error if the incoming
-        /// request body is empty.
+        /// using <see cref="FromBodyAttribute"/>) will register an error in the
+        /// <see cref="ModelStateDictionary"/> if the incoming request body is empty.
         /// </example>
-        public bool AllowEmptyInputInInputFormatter { get; set; }
+        public bool AllowEmptyInputInBodyModelBinding { get; set; }
 
         /// <summary>
         /// Gets a Dictionary of CacheProfile Names, <see cref="CacheProfile"/> which are pre-defined settings for
