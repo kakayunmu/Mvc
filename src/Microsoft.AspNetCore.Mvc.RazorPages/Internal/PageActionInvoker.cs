@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -358,7 +359,14 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
 
             if (propertyFilter != null)
             {
-                propertyFilter.Subject = _page;
+                object subject = _page;
+
+                if (_model != null)
+                {
+                    subject = _model;
+                }
+
+                propertyFilter.Subject = subject;
                 propertyFilter.ApplyTempDataChanges(_pageContext.HttpContext);
             }
 
