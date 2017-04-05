@@ -159,7 +159,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task BindModel_PassesAllowEmptyInputOptionViaContext(bool allowEmptyInputValue)
+        public async Task BindModel_PassesAllowEmptyInputOptionViaContext(bool treatEmptyInputAsDefaultValueOption)
         {
             // Arrange
             var mockInputFormatter = new Mock<IInputFormatter>();
@@ -178,14 +178,14 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
                 metadataProvider: provider);
             bindingContext.BinderModelName = "custom";
 
-            var binder = CreateBinder(new[] { inputFormatter }, allowEmptyInputValue);
+            var binder = CreateBinder(new[] { inputFormatter }, treatEmptyInputAsDefaultValueOption);
 
             // Act
             await binder.BindModelAsync(bindingContext);
 
             // Assert
             mockInputFormatter.Verify(formatter => formatter.ReadAsync(
-                It.Is<InputFormatterContext>(ctx => ctx.AllowEmptyInput == allowEmptyInputValue)),
+                It.Is<InputFormatterContext>(ctx => ctx.TreatEmptyInputAsDefaultValue == treatEmptyInputAsDefaultValueOption)),
                 Times.Once);
         }
 
@@ -390,11 +390,11 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
             return bindingContext;
         }
 
-        private static BodyModelBinder CreateBinder(IList<IInputFormatter> formatters, bool allowEmptyInputInInputFormatter = false)
+        private static BodyModelBinder CreateBinder(IList<IInputFormatter> formatters, bool treatEmptyInputAsDefaultValueOption = false)
         {
             var sink = new TestSink();
             var loggerFactory = new TestLoggerFactory(sink, enabled: true);
-            var options = new MvcOptions { AllowEmptyInputInInputFormatter = allowEmptyInputInInputFormatter };
+            var options = new MvcOptions { AllowEmptyInputInInputFormatter = treatEmptyInputAsDefaultValueOption };
             return new BodyModelBinder(formatters, new TestHttpRequestStreamReaderFactory(), loggerFactory, options);
         }
 

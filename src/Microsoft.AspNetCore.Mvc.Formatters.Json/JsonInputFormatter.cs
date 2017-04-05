@@ -158,7 +158,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
 
                     if (successful)
                     {
-                        if (model == null && !context.AllowEmptyInput)
+                        if (model == null && !context.TreatEmptyInputAsDefaultValue)
                         {
                             // Some nonempty inputs might deserialize as null, for example whitespace,
                             // or the JSON-encoded value "null". The upstream BodyModelBinder needs to

@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
         /// A delegate which can create a <see cref="TextReader"/> for the request body.
         /// </param>
         /// <param name="allowEmptyInput">
-        /// A value for <see cref="AllowEmptyInput"/>.
+        /// A value for the <see cref="TreatEmptyInputAsDefaultValue"/> property.
         /// </param>
         public InputFormatterContext(
             HttpContext httpContext,
@@ -97,18 +97,18 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             ModelState = modelState;
             Metadata = metadata;
             ReaderFactory = readerFactory;
-            AllowEmptyInput = allowEmptyInput;
+            TreatEmptyInputAsDefaultValue = allowEmptyInput;
             ModelType = metadata.ModelType;
         }
 
         /// <summary>
         /// Gets a flag to indicate whether the input formatter should allow no value to be provided.
         /// If <see langword="false"/>, the input formatter should handle empty input by returning
-        /// <see cref="InputFormatterResult.NoValueAsync()"/>. If <see langword="false"/>, the input
+        /// <see cref="InputFormatterResult.NoValueAsync()"/>. If <see langword="true"/>, the input
         /// formatter should handle empty input by returning the default value for the type
         /// <see cref="ModelType"/>.
         /// </summary>
-        public bool AllowEmptyInput { get; }
+        public bool TreatEmptyInputAsDefaultValue { get; }
 
         /// <summary>
         /// Gets the <see cref="Http.HttpContext"/> associated with the current operation.
