@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -347,10 +346,10 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
             }
 
             // This is a workaround for not yet having proper filter for Pages.
-            SaveTempDataPropertyFilter propertyFilter = null;
+            PageSaveTempDataPropertyFilter propertyFilter = null;
             for (var i = 0; i < _filters.Length; i++)
             {
-                propertyFilter = _filters[i] as SaveTempDataPropertyFilter;
+                propertyFilter = _filters[i] as PageSaveTempDataPropertyFilter;
                 if (propertyFilter != null)
                 {
                     break;
@@ -366,6 +365,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
                     subject = _model;
                 }
 
+                propertyFilter.SetTempDataProperties(subject.GetType());
                 propertyFilter.Subject = subject;
                 propertyFilter.ApplyTempDataChanges(_pageContext.HttpContext);
             }
