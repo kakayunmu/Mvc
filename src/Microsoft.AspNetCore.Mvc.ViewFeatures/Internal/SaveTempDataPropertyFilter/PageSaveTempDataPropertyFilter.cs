@@ -13,17 +13,28 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures.Internal
         public PageSaveTempDataPropertyFilter(ITempDataDictionaryFactory factory)
             : base(factory)
         {
+            OriginalValues = new Dictionary<PropertyInfo, object>();
         }
 
         public PageSaveTempDataPropertyFilterFactory FilterFactory { get; set; }
 
+        /// <summary>
+        /// Creates and applies the set of <see cref="TempDataProperty"/>'s for the given <paramref name="modelType"/>.
+        /// </summary>
+        /// <param name="modelType">The <see cref="Type"/> to create <see cref="TempDataProperty"/>'s for.</param>
         public void SetTempDataProperties(Type modelType)
         {
+            if (FilterFactory == null)
+            {
+                throw new ArgumentNullException(nameof(FilterFactory));
+            }
+
             TempDataProperties = FilterFactory.GetTempDataProperties(modelType);
         }
 
         /// <summary>
-        /// Applies values from TempData from <paramref name="httpContext"/> to the .
+        /// Applies values from TempData from <paramref name="httpContext"/> to the
+        /// <see cref="SaveTempDataPropertyFilterBase.Subject"/>.
         /// </summary>
         /// <param name="httpContext">The <see cref="HttpContext"/> used to find TempData.</param>
         public void ApplyTempDataChanges(HttpContext httpContext)

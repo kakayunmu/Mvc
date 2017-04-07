@@ -21,6 +21,17 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
         public HttpClient Client { get; }
 
         [Fact]
+        public async Task RazorPage_TempDataFilters_DontSurviveBetweenPages()
+        {
+            var response = await Client.GetAsync("http://localhost/TempData/TempDataPageModelProperty");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            //If the filter from above was re-used in the below request the request would fail due to type cast.
+            response = await Client.GetAsync("http://localhost/HandlerTestPage");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
         public async Task Page_Handler_FormAction()
         {
             // Arrange & Act

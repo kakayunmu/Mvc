@@ -13,10 +13,19 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures.Internal
 
         protected readonly ITempDataDictionaryFactory _factory;
 
+        /// <summary>
+        /// Describes the temp data properties which exist on <see cref="Subject"/>
+        /// </summary>
         public IList<TempDataProperty> TempDataProperties { get; set; }
-        
+
+        /// <summary>
+        /// The <see cref="object"/> which has the temp data properties.
+        /// </summary>
         public object Subject { get; set; }
 
+        /// <summary>
+        /// Tracks the values which originally existed in temp data.
+        /// </summary>
         public IDictionary<PropertyInfo, object> OriginalValues { get; set; }
 
         public SaveTempDataPropertyFilterBase(ITempDataDictionaryFactory factory)
@@ -25,7 +34,7 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures.Internal
         }
 
         /// <summary>
-        /// Puts the modified values of  into <paramref name="tempData"/>.
+        /// Puts the modified values of <see cref="Subject"/> into <paramref name="tempData"/>.
         /// </summary>
         /// <param name="tempData">The <see cref="ITempDataDictionary"/> to be updated.</param>
         public void OnTempDataSaving(ITempDataDictionary tempData)
@@ -46,6 +55,11 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures.Internal
             }
         }
 
+        /// <summary>
+        /// Sets the values of the properties of <paramref name="subject"/> from <paramref name="tempData"/>.
+        /// </summary>
+        /// <param name="tempData">The <see cref="ITempDataDictionary"/> with the data to set on <paramref name="subject"/>.</param>
+        /// <param name="subject">The <see cref="object"/> which will have it's properties set.</param>
         protected void SetPropertyVaules(ITempDataDictionary tempData, object subject)
         {
             if (TempDataProperties == null)

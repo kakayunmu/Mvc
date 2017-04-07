@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -12,27 +11,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.Mvc.ViewFeatures.Internal
 {
-    public class SaveTempDataPropertyFilterTestBase
-    {
-        protected IList<TempDataProperty> BuildPropertyHelpers<TSubject>()
-        {
-            var subjectType = typeof(TSubject);
-
-            var properties = subjectType.GetProperties(
-                BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-
-            var result = new List<TempDataProperty>();
-
-            foreach (var property in properties)
-            {
-                result.Add(new TempDataProperty(property, property.GetValue, property.SetValue));
-            }
-
-            return result;
-        }
-    }
-
-    public class ControllerSaveTempDataPropertyFilterTest : SaveTempDataPropertyFilterTestBase
+    public class ControllerSaveTempDataPropertyFilterTest
     {
         [Fact]
         public void PopulatesTempDataWithValuesFromControllerProperty()
@@ -48,7 +27,7 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures.Internal
 
             var controller = new TestController();
 
-            filter.TempDataProperties = BuildPropertyHelpers<TestController>();
+            filter.TempDataProperties = SaveTempDataPropertyFilterHelper.BuildPropertyHelpers<TestController>();
             var context = new ActionExecutingContext(
                 new ActionContext
                 {
@@ -84,7 +63,7 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures.Internal
             var filter = CreateControllerSaveTempDataPropertyFilter(httpContext, tempData: tempData);
             var controller = new TestController();
 
-            filter.TempDataProperties = BuildPropertyHelpers<TestController>();
+            filter.TempDataProperties = SaveTempDataPropertyFilterHelper.BuildPropertyHelpers<TestController>();
 
             var context = new ActionExecutingContext(
                 new ActionContext
